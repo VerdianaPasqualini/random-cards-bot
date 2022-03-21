@@ -16,7 +16,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = os.environ.get("TOKEN")
 PATH="carte/"
 
 def get_filenames(path=PATH):
@@ -70,7 +70,7 @@ class Bot:
         updater.dispatcher.add_handler(CallbackQueryHandler(self.show_soluz))
         dispatcher.add_handler(MessageHandler(Filters.all, self.send_image))
         
-        PORT = int(os.getenv("PORT", "8443"))
+        PORT = int(os.environ.get("PORT", "8443"))
 
         # Starting bot
         if len(sys.argv) == 2 and sys.argv[1] == "DEV":
