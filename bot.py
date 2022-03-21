@@ -1,7 +1,4 @@
-import logging, os, sys, random
-from typing import Dict
-from datetime import date
-
+import os, sys, random
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import (
     Updater,
@@ -11,27 +8,23 @@ from telegram.ext import (
     CallbackContext,
     CallbackQueryHandler,
 )
-# Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
 
 TOKEN = os.environ.get("TOKEN")
 PATH="carte/"
+PORT = int(os.environ.get("PORT", "8443"))
 
 def get_filenames(path=PATH):
     return [f"{path}/{image}" for image in os.listdir(path) if image.endswith("a.png")]
 
 class Bot:
-
-    next_enigma = [[KeyboardButton("Nuovo enigma!")]]
+    new_enigma_button = [[KeyboardButton("Nuovo enigma!")]]
     def __init__(self):
         self.images = get_filenames()
+        self.new_enigma_markup = ReplyKeyboardMarkup(self.new_enigma_button, resize_keyboard=True)
 
     def welcome(self, update: Update, context: CallbackContext) -> None:
-        button = [[KeyboardButton("Premimi!")]]
         update.message.reply_text(
-            "Ciao", reply_markup=ReplyKeyboardMarkup(button)
+            "Ciao", reply_markup=self.new_enigma_markup
         )
 
     def send_image(self, update: Update, context: CallbackContext) -> None:
@@ -54,10 +47,10 @@ class Bot:
         query.answer()
 
         image = query.data.replace("a.png", "b.png")
-
         with open(image, 'rb') as f:
             update.callback_query.message.reply_photo(
-                f
+                f,
+                reply_markup=self.new_enigma_markup
             )
     
     def start(self) -> None:
@@ -70,8 +63,6 @@ class Bot:
         updater.dispatcher.add_handler(CallbackQueryHandler(self.show_soluz))
         dispatcher.add_handler(MessageHandler(Filters.all, self.send_image))
         
-        PORT = int(os.environ.get("PORT", "8443"))
-
         # Starting bot
         if len(sys.argv) == 2 and sys.argv[1] == "DEV":
             # Developer mode with local instance
