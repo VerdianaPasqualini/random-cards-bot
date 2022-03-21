@@ -82,8 +82,8 @@ class Bot:
             print("Start webhook")
             updater.start_webhook(listen="0.0.0.0",
                                 port=PORT,
-                                url_path=TOKEN)
-            updater.bot.set_webhook("https://random-cards-bot.herokuapp.com/" + TOKEN)
+                                url_path=TOKEN,
+                                webhook_url="https://random-cards-bot.herokuapp.com/" + TOKEN)
         updater.idle()
 
 if __name__ == '__main__':
