@@ -10,9 +10,10 @@ from telegram.ext import (
 )
 
 TOKEN = os.environ.get("TOKEN")
-PATH="carte/"
+PATH = "carte/"
 PORT = int(os.environ.get("PORT", "8443"))
 
+# Read files from folder
 def get_filenames(path=PATH):
     return [f"{path}/{image}" for image in os.listdir(path) if image.endswith("a.png")]
 
@@ -30,12 +31,14 @@ class Bot:
     def send_image(self, update: Update, context: CallbackContext) -> None:
         image = random.choice(self.images)
         reply_markup = None
+        # Solution button if solution exists
         if os.path.exists(image.replace("a.png", "b.png")):
             keyboard = [
                 [InlineKeyboardButton("Soluzione", callback_data=image)],
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
+        # Send image and solution button 
         with open(image, 'rb') as f:
             update.message.reply_photo(
                 f,
@@ -46,6 +49,7 @@ class Bot:
         query = update.callback_query
         query.answer()
 
+        # Get solution by changing the name of the file
         image = query.data.replace("a.png", "b.png")
         with open(image, 'rb') as f:
             update.callback_query.message.reply_photo(
